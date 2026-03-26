@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mb-5 mt-3">
+    <div class="col-lg-10">
+        <!-- Header -->
+        <div class="text-center mb-5">
+            <h2 class="fw-bold"><span class="text-primary">AI</span> Health Analysis Result</h2>
+            <p class="text-muted-custom">Based on your entry from <span class="text-light">{{ record.recorded_at.strftime('%B %d, %Y - %H:%M') }}</span></p>
+        </div>
+
+        <!-- Main Stats Card -->
+        <div class="glass-card text-center mb-5 border-0 bg-dark" style="box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+            <div class="row border-bottom border-secondary pb-4 mb-4">
+                <div class="col-md-4 border-end border-secondary">
+                    <p class="text-muted-custom mb-2">Weight</p>
+                    <h2 class="fw-bold">{{ record.weight }} <span class="fs-5 fw-normal text-muted-custom">kg</span></h2>
+                </div>
+                <div class="col-md-4 border-end border-secondary">
+                    <p class="text-muted-custom mb-2">Height</p>
+                    <h2 class="fw-bold">{{ record.height_used }} <span class="fs-5 fw-normal text-muted-custom">cm</span></h2>
+                </div>
+                <div class="col-md-4">
+                    <p class="text-muted-custom mb-2">BMI Score</p>
+                    <h2 class="fw-bold">{{ record.bmi_value }}</h2>
+                </div>
+            </div>
+            
+            <h5 class="text-muted-custom mb-3">Health Classification</h5>
+            <h1 class="display-5 status-{{ record.category|lower }} px-5 py-2 border rounded-pill d-inline-block" style="background: rgba(15,23,42,0.8); border-color: inherit !important;">
+                {{ record.category }}
+            </h1>
+        </div>
+
+        <!-- AI Engine Insights -->
+        <h3 class="fw-bold mb-4"><i class="fa-solid fa-brain text-primary me-2"></i> Intelligent Recommendations</h3>
+        
+        <div class="glass-card text-start mb-4 p-4 border border-primary">
+            <h5 class="text-primary mb-3"><i class="fa-solid fa-bolt me-2"></i>AI Executive Summary</h5>
+            <p class="mb-0 fs-5 text-main" style="line-height: 1.5;">{{ record.health_summary }}</p>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <!-- Health Risk -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-warning border-4 p-4 text-start">
+                    <h5 class="mb-3 text-warning"><i class="fa-solid fa-triangle-exclamation me-2"></i> Health Risks & Outlook</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.health_risk }}</p>
+                </div>
+            </div>
+
+            <!-- Diet Plan -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-success border-4 p-4 text-start">
+                    <h5 class="mb-4 text-success"><i class="fa-solid fa-utensils me-2"></i> Dietary Strategy</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.diet_recommendation }}</p>
+                </div>
+            </div>
+
+            <!-- Foods to Eat -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-primary border-4 p-4 text-start">
+                    <h5 class="mb-3 text-primary"><i class="fa-solid fa-check-circle me-2"></i> Foods to Eat</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.foods_to_eat }}</p>
+                </div>
+            </div>
+
+            <!-- Foods to Avoid -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-danger border-4 p-4 text-start">
+                    <h5 class="mb-3 text-danger"><i class="fa-solid fa-ban me-2"></i> Foods to Avoid</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.foods_to_avoid }}</p>
+                </div>
+            </div>
+
+            <!-- Exercise Plan -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-info border-4 p-4 text-start">
+                    <h5 class="mb-4 text-info"><i class="fa-solid fa-dumbbell me-2"></i> Exercise Protocol</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.exercise_plan }}</p>
+                </div>
+            </div>
+
+            <!-- Lifestyle -->
+            <div class="col-md-6">
+                <div class="glass-card h-100 border-start border-secondary border-4 p-4 text-start">
+                    <h5 class="mb-3 text-secondary"><i class="fa-solid fa-bed me-2"></i> Lifestyle & Daily Activity</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.lifestyle_advice }}</p>
+                </div>
+            </div>
+
+            <!-- Daily/Weekly Tips -->
+            <div class="col-md-12">
+                <div class="glass-card h-100 border-start border-light border-4 p-4 text-start">
+                    <h5 class="mb-3 text-light"><i class="fa-solid fa-lightbulb me-2"></i> Daily/Weekly Tips</h5>
+                    <p class="mb-0 text-main" style="line-height: 1.6; white-space: pre-line;">{{ record.daily_tips }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="text-center mt-5">
+            <a href="{{ url_for('views.dashboard') }}" class="btn btn-outline-light px-4 py-2 me-3"><i class="fa-solid fa-arrow-left me-2"></i> Dashboard</a>
+            <a href="{{ url_for('views.report') }}" class="btn btn-primary-custom px-4 py-2"><i class="fa-solid fa-file-pdf me-2"></i> View Full Report</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

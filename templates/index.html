@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row align-items-center min-vh-75 mt-5">
+    <div class="col-lg-6 text-center text-lg-start mb-5 mb-lg-0">
+        <h1 class="display-4 fw-bold mb-4">Intelligent Health Tracking & Insights</h1>
+        <p class="lead text-muted-custom mb-5">
+            Monitor your Body Mass Index over time and receive personalized, AI-driven recommendations for your diet and exercise regimen.
+        </p>
+        <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-lg-start">
+            <a href="{{ url_for('auth.register') }}" class="btn btn-primary-custom btn-lg px-4 gap-3">Get Started Today</a>
+            <a href="{{ url_for('auth.login') }}" class="btn btn-outline-light btn-lg px-4">Login</a>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <div class="glass-card p-4 text-center">
+            <i class="fa-solid fa-robot fa-4x text-primary mb-4"></i>
+            <h3>Smart AI Engine</h3>
+            <p class="text-muted-custom">Our system analyzes your age, gender, and BMI to generate actionable lifestyle recommendations.</p>
+            <div class="row mt-4">
+                <div class="col-4">
+                    <i class="fa-solid fa-chart-pie fa-2x text-success mb-2"></i>
+                    <p class="small">Analytics</p>
+                </div>
+                <div class="col-4">
+                    <i class="fa-solid fa-apple-whole fa-2x text-danger mb-2"></i>
+                    <p class="small">Diet Plans</p>
+                </div>
+                <div class="col-4">
+                    <i class="fa-solid fa-person-running fa-2x text-warning mb-2"></i>
+                    <p class="small">Workouts</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

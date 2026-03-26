@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-weight-scale fa-3x text-primary mb-3"></i>
+                <h3 class="fw-bold">Log New Health Entry</h3>
+                <p class="text-muted-custom">Enter your current metrics to generate updated AI insights.</p>
+            </div>
+            
+            <form method="POST">
+                <div class="mb-5 mt-4">
+                    <label for="weight" class="form-label text-muted-custom"><i class="fa-solid fa-weight-hanging me-2 text-primary"></i>Current Weight (kg)</label>
+                    <input type="number" step="0.1" class="form-control form-control-custom form-control-lg text-center fw-bold text-main" style="font-size: 2rem;" id="weight" name="weight" placeholder="0.0" required autofocus>
+                </div>
+                
+                <div class="alert alert-secondary text-start mb-4 bg-transparent border-secondary" role="alert">
+                    <i class="fa-solid fa-shield-halved text-success me-2"></i><strong>Stable Profile Active</strong><br>
+                    <small>Height ({{ current_user.height }}cm) and Age ({{ current_user.age }}) are securely loaded from your profile setting. <a href="{{ url_for('views.profile') }}" class="text-primary text-decoration-none">Edit Profile</a>.</small>
+                </div>
+                
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary-custom btn-lg"><i class="fa-solid fa-wand-magic-sparkles me-2"></i> Calculate & Analyze Data</button>
+                    <a href="{{ url_for('views.dashboard') }}" class="btn btn-outline-light mt-3">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

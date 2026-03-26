@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mt-4 mb-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="glass-card">
+            <div class="text-center mb-4">
+                <i class="fa-solid fa-address-card fa-3x text-primary mb-3"></i>
+                <h3 class="fw-bold">Profile Settings</h3>
+                <p class="text-muted-custom">Manage your biologically persistent metrics.</p>
+            </div>
+            
+            <!-- Warning block identifying data restrictions -->
+            <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+                <i class="fa-solid fa-triangle-exclamation fa-2x me-3"></i>
+                <div>
+                   <strong>Data Consistency Algorithm Enabled</strong><br>
+                   Our AI tracks consistency. Updating your age or height with statistically improbable values will be securely blocked.
+                </div>
+            </div>
+
+            <form method="POST">
+                <div class="mb-4">
+                    <label class="form-label text-muted-custom"><i class="fa-solid fa-user me-2 text-primary"></i>Username</label>
+                    <input type="text" class="form-control form-control-custom bg-dark text-muted" value="{{ user.username }}" disabled>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <label for="age" class="form-label text-muted-custom"><i class="fa-solid fa-cake-candles me-2 text-primary"></i>Current Age</label>
+                        <input type="number" class="form-control form-control-custom fw-bold" id="age" name="age" value="{{ user.age }}" min="1" max="120" required>
+                    </div>
+                    <div class="col-md-6 mt-4 mt-md-0">
+                        <label for="gender" class="form-label text-muted-custom"><i class="fa-solid fa-venus-mars me-2 text-primary"></i>Gender</label>
+                        <select class="form-select form-control-custom fw-bold" id="gender" name="gender" required>
+                            <option value="Male" {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+                            <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+                            <option value="Other" {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label for="height" class="form-label text-muted-custom"><i class="fa-solid fa-ruler-vertical me-2 text-warning"></i>Stable Height (cm)</label>
+                    <input type="number" step="0.1" class="form-control form-control-custom text-center fw-bold" style="font-size: 1.5rem;" id="height" name="height" value="{{ user.height }}" required>
+                </div>
+                
+                <div class="d-grid mt-5">
+                    <button type="submit" class="btn btn-primary-custom"><i class="fa-solid fa-floppy-disk me-2"></i> Save Profile Integrities</button>
+                    <a href="{{ url_for('views.dashboard') }}" class="btn btn-outline-light mt-3">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

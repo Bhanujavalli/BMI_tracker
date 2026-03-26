@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-5 mt-3">
+    <div class="col-12">
+        <h2 class="fw-bold">Welcome, {{ current_user.username }}</h2>
+        <p class="text-muted-custom border-bottom border-secondary pb-3">Here is an overview of your health statistics.</p>
+    </div>
+</div>
+
+<div class="row g-4 mb-5">
+    <!-- User summary card -->
+    <div class="col-md-4">
+        <div class="glass-card text-center h-100 d-flex flex-column justify-content-center">
+            <h5 class="text-muted-custom mb-3">Current Status</h5>
+            {% if latest_record %}
+                <div class="dashboard-stat-value mb-2">{{ latest_record.bmi_value }}</div>
+                <h4 class="status-{{ latest_record.category|lower }} border border-secondary p-2 rounded d-inline-block">{{ latest_record.category }}</h4>
+                <p class="text-muted-custom mt-3 mb-0 small">Last logged: {{ latest_record.recorded_at.strftime('%Y-%m-%d') }}</p>
+                <a href="{{ url_for('views.result', record_id=latest_record.id) }}" class="btn btn-outline-primary btn-sm mt-3 w-75 mx-auto">View Latest Analysis</a>
+            {% else %}
+                <p class="text-muted-custom mb-4">No records found. Start by logging your BMI.</p>
+                <a href="{{ url_for('views.add_bmi') }}" class="btn btn-primary-custom"><i class="fa-solid fa-plus me-2"></i> Log First Entry</a>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Profile summary -->
+    <div class="col-md-4">
+         <div class="glass-card text-center h-100 d-flex flex-column justify-content-center">
+            <h5 class="text-muted-custom mb-4">Your Profile</h5>
+            <div class="d-flex justify-content-around mb-3">
+                <div>
+                    <i class="fa-solid fa-cake-candles text-primary fa-2x mb-3"></i>
+                    <h5 class="fw-bold mb-0">{{ current_user.age }}<span class="text-muted-custom small fw-normal ms-1">years</span></h5>
+                </div>
+                <div class="border-end border-secondary"></div>
+                <div>
+                    <i class="fa-solid fa-ruler-vertical text-warning fa-2x mb-3"></i>
+                    <h5 class="fw-bold mb-0">{{ current_user.height }}<span class="text-muted-custom small fw-normal ms-1">cm</span></h5>
+                </div>
+            </div>
+         </div>
+    </div>
+
+    <!-- Quick action / recent weight -->
+    <div class="col-md-4">
+        <div class="glass-card text-center h-100 d-flex flex-column justify-content-center">
+             <h5 class="text-muted-custom mb-4">Current Weight</h5>
+             {% if latest_record %}
+                 <h2 class="fw-bold display-5 text-main mb-3">{{ latest_record.weight }} kg</h2>
+                 <p class="text-muted-custom small"><i class="fa-solid fa-arrow-trend-up me-1 text-success"></i> Keep tracking consistency.</p>
+             {% else %}
+                 <h2 class="fw-bold display-5 text-muted mb-3">-- kg</h2>
+             {% endif %}
+             <a href="{{ url_for('views.add_bmi') }}" class="btn btn-outline-light btn-sm mt-auto mx-auto px-4"><i class="fa-solid fa-weight-scale me-1"></i> Log New Weight</a>
+        </div>
+    </div>
+</div>
+
+{% if records %}
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="glass-card">
+            <h4 class="mb-4 fw-bold"><i class="fa-solid fa-chart-line text-primary me-2"></i> BMI Progress Overview</h4>
+            <div style="height: 300px; width: 100%;">
+                <canvas id="progressChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+{% if records %}
+<script>
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    
+    let gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(59, 130, 246, 0.4)');
+    gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+    const labels = {{ chart_dates | tojson }};
+    const values = {{ chart_bmis | tojson }};
+
+    const progressChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'BMI Trend',
+                data: values,
+                borderColor: '#3b82f6',
+                backgroundColor: gradient,
+                borderWidth: 3,
+                pointBackgroundColor: '#0f172a',
+                pointBorderColor: '#3b82f6',
+                pointHoverBackgroundColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 6,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f8fafc',
+                    bodyColor: '#e2e8f0',
+                    borderColor: 'rgba(255,255,255,0.1)',
+                    borderWidth: 1,
+                    padding: 10
+                },
+                annotation: {
+                    annotations: {
+                        line1: {
+                            type: 'line',
+                            yMin: 18.5,
+                            yMax: 18.5,
+                            borderColor: 'rgba(59, 130, 246, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                display: true,
+                                content: '18.5 (Underweight / Normal)',
+                                position: 'end',
+                                backgroundColor: 'rgba(59, 130, 246, 0.8)'
+                            }
+                        },
+                        line2: {
+                            type: 'line',
+                            yMin: 25.0,
+                            yMax: 25.0,
+                            borderColor: 'rgba(16, 185, 129, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                display: true,
+                                content: '25.0 (Normal / Overweight)',
+                                position: 'end',
+                                backgroundColor: 'rgba(16, 185, 129, 0.8)'
+                            }
+                        },
+                        line3: {
+                            type: 'line',
+                            yMin: 30.0,
+                            yMax: 30.0,
+                            borderColor: 'rgba(239, 68, 68, 0.5)',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            label: {
+                                display: true,
+                                content: '30.0 (Overweight / Obese)',
+                                position: 'end',
+                                backgroundColor: 'rgba(239, 68, 68, 0.8)'
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#94a3b8', font: {family: 'Inter'} }
+                },
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94a3b8', font: {family: 'Inter'} }
+                }
+            }
+        }
+    });
+</script>
+{% endif %}
+{% endblock %}
