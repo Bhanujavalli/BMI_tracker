@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="row mb-5 mt-3">
-    <div class="col-12">
-        <h2 class="fw-bold">Welcome, {{ current_user.username }}</h2>
-        <p class="text-muted-custom border-bottom border-secondary pb-3">Here is an overview of your health statistics.</p>
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <div>
+            <h2 class="fw-bold">Welcome, {{ current_user.username }}</h2>
+            <p class="text-muted-custom pb-1 mb-0 border-bottom border-secondary">Here is an overview of your health statistics.</p>
+        </div>
+        <div class="text-end">
+            <div class="badge bg-dark border border-warning fs-5 p-2 rounded-pill shadow-sm" title="Your tracking streak">
+                <i class="fa-solid fa-fire text-warning me-2"></i>{{ current_user.current_streak }} Day Streak
+            </div>
+        </div>
     </div>
 </div>
 
@@ -24,21 +31,55 @@
         </div>
     </div>
     
-    <!-- Profile summary -->
+    <!-- Health Score & Avatar -->
     <div class="col-md-4">
-         <div class="glass-card text-center h-100 d-flex flex-column justify-content-center">
-            <h5 class="text-muted-custom mb-4">Your Profile</h5>
-            <div class="d-flex justify-content-around mb-3">
-                <div>
-                    <i class="fa-solid fa-cake-candles text-primary fa-2x mb-3"></i>
-                    <h5 class="fw-bold mb-0">{{ current_user.age }}<span class="text-muted-custom small fw-normal ms-1">years</span></h5>
-                </div>
-                <div class="border-end border-secondary"></div>
-                <div>
-                    <i class="fa-solid fa-ruler-vertical text-warning fa-2x mb-3"></i>
-                    <h5 class="fw-bold mb-0">{{ current_user.height }}<span class="text-muted-custom small fw-normal ms-1">cm</span></h5>
-                </div>
+         <div class="glass-card text-center h-100 d-flex flex-column justify-content-center position-relative">
+            <h5 class="text-muted-custom mb-4">Health Score</h5>
+            {% if health_score is not none %}
+            <div class="position-relative d-inline-flex justify-content-center align-items-center mb-3">
+                <svg width="120" height="120" viewBox="0 0 120 120">
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="8"></circle>
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="var(--primary)" stroke-width="8" stroke-dasharray="314" stroke-dashoffset="{{ 314 - (314 * health_score / 100) }}" stroke-linecap="round" style="transition: stroke-dashoffset 1.5s ease-in-out; transform: rotate(-90deg); transform-origin: 50% 50%;"></circle>
+                </svg>
+                <div class="position-absolute fs-3 fw-bold">{{ health_score }}<span class="fs-6 text-muted-custom fw-normal">/100</span></div>
             </div>
+            
+            <!-- Dynamic Human Avatar representation -->
+            <div class="mt-2 avatar-container d-flex justify-content-center align-items-end" style="height: 140px;">
+                {% set bmi = latest_record.bmi_value | default(22.0) %}
+                {% set raw_scale = bmi / 22.0 %}
+                {% set scale_factor = raw_scale if raw_scale >= 0.8 else 0.8 %}
+                {% set scale_factor = scale_factor if scale_factor <= 2.5 else 2.5 %}
+                <svg width="120" height="140" viewBox="0 0 100 120" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="humanGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="var(--primary)" />
+                            <stop offset="100%" stop-color="var(--primary-hover)" />
+                        </linearGradient>
+                    </defs>
+                    <!-- Head (Static) -->
+                    <circle cx="50" cy="15" r="12" fill="url(#humanGradient)" />
+                    
+                    <!-- Body (Scales width based on BMI) -->
+                    <g style="display: block; transform-origin: 50% 100%; transform: scaleX({{ scale_factor }}); transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);">
+                        <!-- Neck/Torso -->
+                        <path d="M 45,28 L 55,28 C 65,28 68,35 68,45 L 68,75 C 68,85 65,90 50,90 C 35,90 32,85 32,75 L 32,45 C 32,35 35,28 45,28 Z" fill="url(#humanGradient)" />
+                        <!-- Left Arm -->
+                        <path d="M 32,40 Q 20,65 24,85" stroke="url(#humanGradient)" stroke-width="7" stroke-linecap="round" fill="none" />
+                        <!-- Right Arm -->
+                        <path d="M 68,40 Q 80,65 76,85" stroke="url(#humanGradient)" stroke-width="7" stroke-linecap="round" fill="none" />
+                        <!-- Left Leg -->
+                        <path d="M 40,85 L 35,115" stroke="url(#humanGradient)" stroke-width="9" stroke-linecap="round" fill="none" />
+                        <!-- Right Leg -->
+                        <path d="M 60,85 L 65,115" stroke="url(#humanGradient)" stroke-width="9" stroke-linecap="round" fill="none" />
+                    </g>
+                </svg>
+            </div>
+            {% else %}
+                <div class="d-flex justify-content-center align-items-center mb-3 h-100">
+                    <p class="text-muted-custom">Log data to see score</p>
+                </div>
+            {% endif %}
          </div>
     </div>
 
@@ -70,6 +111,29 @@
 </div>
 {% endif %}
 
+{% if latest_record %}
+<div class="row mt-5 mb-5">
+    <div class="col-12">
+        <div class="glass-card">
+            <h4 class="mb-4 fw-bold"><i class="fa-solid fa-robot text-warning me-2"></i> Daily AI Intelligence Briefing</h4>
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <h6 class="text-main fw-bold"><i class="fa-solid fa-lightbulb text-warning me-2"></i>Summary Recommendation</h6>
+                    <p class="text-muted-custom text-wrap" style="line-height: 1.6;">{{ latest_record.health_summary }}</p>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <h6 class="text-main fw-bold"><i class="fa-solid fa-apple-whole text-success me-2"></i>Diet & Nutrition</h6>
+                    <p class="text-muted-custom" style="line-height: 1.6;">{{ latest_record.diet_recommendation | replace('\n', '<br>') | safe }}</p>
+                </div>
+            </div>
+            <div class="text-end mt-2">
+                <a href="{{ url_for('views.result', record_id=latest_record.id) }}" class="btn btn-outline-primary btn-sm">Full Action Plan <i class="fa-solid fa-arrow-right ms-1"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block scripts %}
@@ -82,26 +146,42 @@
     gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
 
     const labels = {{ chart_dates | tojson }};
-    const values = {{ chart_bmis | tojson }};
+    // The main line only plots actual recorded data (so we pad the predicted end point with null)
+    const actual_bmi = {{ chart_bmis | tojson }};
+    const values = [...actual_bmi, null];
+    // The predictive dataset
+    const predictive_values = {{ predictive_bmis | default('[]') | tojson }};
 
     const progressChart = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'BMI Trend',
-                data: values,
-                borderColor: '#3b82f6',
-                backgroundColor: gradient,
-                borderWidth: 3,
-                pointBackgroundColor: '#0f172a',
-                pointBorderColor: '#3b82f6',
-                pointHoverBackgroundColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 6,
-                fill: true,
-                tension: 0.3
-            }]
+            datasets: [
+                {
+                    label: 'Actual BMI',
+                    data: values,
+                    borderColor: '#3b82f6',
+                    backgroundColor: gradient,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#0f172a',
+                    pointBorderColor: '#3b82f6',
+                    pointHoverBackgroundColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 6,
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Predicted Trend',
+                    data: predictive_values,
+                    borderColor: 'rgba(16, 185, 129, 0.8)', // Green dashes
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointRadius: 0, // hide dots
+                    fill: false,
+                    tension: 0.1
+                }
+            ]
         },
         options: {
             responsive: true,

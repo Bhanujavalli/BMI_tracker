@@ -12,7 +12,13 @@
             <form method="POST">
                 <div class="mb-5 mt-4">
                     <label for="weight" class="form-label text-muted-custom"><i class="fa-solid fa-weight-hanging me-2 text-primary"></i>Current Weight (kg)</label>
-                    <input type="number" step="0.1" class="form-control form-control-custom form-control-lg text-center fw-bold text-main" style="font-size: 2rem;" id="weight" name="weight" placeholder="0.0" required autofocus>
+                    <div class="input-group">
+                        <input type="number" step="0.1" class="form-control form-control-custom form-control-lg text-center fw-bold text-main" style="font-size: 2rem;" id="weight" name="weight" placeholder="0.0" required autofocus>
+                        <button class="btn btn-primary-custom" type="button" id="voiceBtn" title="Speak your weight" style="border-top-left-radius: 0; border-bottom-left-radius: 0;">
+                            <i class="fa-solid fa-microphone fs-4"></i>
+                        </button>
+                    </div>
+                    <small id="voiceStatus" class="form-text text-muted-custom mt-2 d-none">Listening for a number...</small>
                 </div>
                 
                 <div class="alert alert-secondary text-start mb-4 bg-transparent border-secondary" role="alert">
@@ -28,4 +34,61 @@
         </div>
     </div>
 </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const voiceBtn = document.getElementById('voiceBtn');
+    const weightInput = document.getElementById('weight');
+    const icon = voiceBtn.querySelector('i');
+    const statusText = document.getElementById('voiceStatus');
+
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+
+        voiceBtn.addEventListener('click', function() {
+            recognition.start();
+            icon.classList.remove('fa-microphone');
+            icon.classList.add('fa-microphone-lines', 'fa-beat', 'text-warning');
+            statusText.classList.remove('d-none');
+        });
+
+        recognition.onresult = function(event) {
+            const result = event.results[0][0].transcript;
+            // Parse English text to number if possible (e.g., "75", "seventy five point five" - keeping it simple with regex for digits)
+            const numberMatch = result.match(/\d+(\.\d+)?/);
+            if (numberMatch) {
+                weightInput.value = parseFloat(numberMatch[0]);
+                statusText.innerHTML = "Logged: " + result;
+                statusText.classList.add('text-success');
+            } else {
+                statusText.innerHTML = "Could not parse number from: '" + result + "'";
+                statusText.classList.add('text-danger');
+            }
+        };
+
+        recognition.onspeechend = function() {
+            recognition.stop();
+            icon.classList.add('fa-microphone');
+            icon.classList.remove('fa-microphone-lines', 'fa-beat', 'text-warning');
+            setTimeout(() => { statusText.classList.add('d-none'); statusText.className = "form-text text-muted-custom mt-2"; }, 4000);
+        };
+        
+        recognition.onerror = function() {
+            icon.classList.add('fa-microphone');
+            icon.classList.remove('fa-microphone-lines', 'fa-beat', 'text-warning');
+            statusText.innerHTML = "Microphone error. Ensure permissions are granted.";
+            statusText.classList.add('text-danger');
+            setTimeout(() => { statusText.classList.add('d-none'); }, 4000);
+        };
+    } else {
+        voiceBtn.style.display = 'none'; // Browser not supported
+    }
+});
+</script>
 {% endblock %}

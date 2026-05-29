@@ -16,8 +16,19 @@ class User(UserMixin, db.Model):
     height = db.Column(db.Float, nullable=False) # Height stored uniquely per user to prevent random changes
     is_admin = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    current_streak = db.Column(db.Integer, default=0)
+    last_log_date = db.Column(db.DateTime, nullable=True)
 
     records = db.relationship('BMIRecord', backref='user', lazy=True)
+    photos = db.relationship('ProgressPhoto', backref='user', lazy=True)
+
+class ProgressPhoto(db.Model):
+    __tablename__ = 'progress_photos'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    filename = db.Column(db.String(256), nullable=False)
+    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class BMIRecord(db.Model):
     __tablename__ = 'bmi_records'

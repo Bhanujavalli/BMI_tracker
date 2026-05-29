@@ -17,19 +17,40 @@ def generate_ai_recommendations(age, gender, bmi_category, bmi_value):
     """
     Simulates an intelligent rule-based AI recommendations engine.
     """
-    risk, diet, exercise, lifestyle, summary = "", "", "", "", ""
-    foods_to_eat, foods_to_avoid, daily_tips = "", "", ""
+    import random
     
-    is_teen = age <= 22
-    is_adult = 23 <= age <= 40
-    is_older = age >= 41
-    is_female = gender.lower() == 'female'
+    is_female = (gender.lower() == 'female')
+    is_teen = (age < 18)
+    is_adult = (18 <= age < 50)
+    
+    variations = {
+        "Underweight": [
+            f"With a BMI of {bmi_value}, you are considered Underweight. Your focus should be on building lean muscle mass through a healthy caloric surplus.",
+            f"Based on my analysis, at a BMI of {bmi_value}, you are under the recommended weight. Let's focus on structured weight gain.",
+            f"Your BMI is {bmi_value} (Underweight). Building lean muscle and achieving a caloric surplus is our top priority."
+        ],
+        "Normal": [
+            f"Great job! Your BMI of {bmi_value} is Normal. Maintaining your balanced diet and current activity level is key.",
+            f"Excellent! Your BMI of {bmi_value} indicates you are in a very healthy range. Our goal is to simply solidify these habits.",
+            f"Great job maintaining a BMI of {bmi_value}. The AI recommends focusing on longevity, mobility, and peak daytime energy now."
+        ],
+        "Overweight": [
+            f"At a BMI of {bmi_value}, you are considered Overweight. Gradual, sustainable fat loss through a minor caloric deficit is the primary goal.",
+            f"Your current BMI is {bmi_value} (Overweight). A gentle, sustainable reduction in daily calories will set you on the right path.",
+            f"At {bmi_value} BMI, you are slightly above ideal weight. Let's implement minor dietary tweaks for steady, healthy fat loss."
+        ],
+        "Obese": [
+            f"Your BMI of {bmi_value} indicates Obesity. Prioritize medically supervised, low-impact activities and a monitored caloric deficit.",
+            f"At a BMI of {bmi_value}, you are considered Obese. Deep metabolic changes and supervised, joint-safe activity are highly recommended.",
+            f"Your BMI is {bmi_value}. Prioritize safe, low-impact movements and strict tracking to regain metabolic control and health."
+        ]
+    }
     
     # ------------------------------------------------------------------------------
     # UNDERWEIGHT
     # ------------------------------------------------------------------------------
     if bmi_category == "Underweight":
-        summary = f"With a BMI of {bmi_value}, you are considered Underweight. Your focus should be on building lean muscle mass through a healthy caloric surplus."
+        summary = random.choice(variations["Underweight"])
         risk = "Potential nutritional deficiencies, weakened immune system, and lower energy levels. "
         diet = "• Goal: Healthy Caloric Surplus (+300 to 500 kcal/day)\n• Focus on nutrient-dense meals and liquid calories if you get full quickly."
         
@@ -72,7 +93,7 @@ def generate_ai_recommendations(age, gender, bmi_category, bmi_value):
     # NORMAL
     # ------------------------------------------------------------------------------
     elif bmi_category == "Normal":
-        summary = f"Great job! Your BMI of {bmi_value} is Normal. Maintaining your balanced diet and current activity level is key."
+        summary = random.choice(variations["Normal"])
         risk = "Low risk of weight-related health issues. However, sedentary behavior can still lead to 'skinny fat' (high visceral fat) risks."
         diet = "• Goal: Maintenance & Optimal Nutrition\n• A balanced macronutrient profile (30% protein, 40% carbs, 30% fats)."
         
@@ -113,7 +134,7 @@ def generate_ai_recommendations(age, gender, bmi_category, bmi_value):
     # OVERWEIGHT
     # ------------------------------------------------------------------------------
     elif bmi_category == "Overweight":
-        summary = f"At a BMI of {bmi_value}, you are considered Overweight. Gradual, sustainable fat loss through a minor caloric deficit is the primary goal."
+        summary = random.choice(variations["Overweight"])
         risk = "Elevated risk of developing cardiovascular disease, hypertension, type 2 diabetes, and increased stress on joints."
         diet = "• Goal: Mild Caloric Deficit (-300 to 500 kcal/day)\n• Focus on mindful eating, high-satiety foods, and portion control."
         
@@ -152,7 +173,7 @@ def generate_ai_recommendations(age, gender, bmi_category, bmi_value):
     # OBESE
     # ------------------------------------------------------------------------------
     else: # Obese
-        summary = f"Your BMI of {bmi_value} indicates Obesity. Prioritize medically supervised, low-impact activities and a strictly monitored caloric deficit to safely improve your metabolic health."
+        summary = random.choice(variations["Obese"])
         risk = "High risk for chronic conditions including severe heart disease, sleep apnea, type 2 diabetes, osteoarthritis, and metabolic syndrome."
         diet = "• Goal: Strictly Monitored Caloric Deficit\n• Strategy: Track meals diligently, aim for volume eating (high bulk, low calorie)."
         
